@@ -2,7 +2,7 @@ from pydantic import BaseModel, EmailStr
 from datetime import date, datetime
 from typing import Optional
 
-# Schémas Utilisateur
+# --- Schémas Utilisateur ---
 class UtilisateurBase(BaseModel):
     nom_utilisateur: str
     telephone: str
@@ -23,7 +23,7 @@ class UtilisateurLogin(BaseModel):
     telephone: str
     mot_de_passe: str
 
-# Schémas Tontine
+# --- Schémas Tontine ---
 class TontineBase(BaseModel):
     nom: str
     description: Optional[str] = None
@@ -44,7 +44,7 @@ class Tontine(TontineBase):
     class Config:
         from_attributes = True
 
-# Schémas Membre
+# --- Schémas Membre ---
 class MembreBase(BaseModel):
     id_tontine: int
     id_utilisateur: int
@@ -60,7 +60,7 @@ class Membre(MembreBase):
     class Config:
         from_attributes = True
 
-# Schémas Paiement
+# --- Schémas Paiement ---
 class PaiementBase(BaseModel):
     id_tontine: int
     montant: int
@@ -77,7 +77,7 @@ class Paiement(PaiementBase):
     class Config:
         from_attributes = True
 
-# Schémas Tour
+# --- Schémas Tour ---
 class TourBase(BaseModel):
     id_tontine: int
     periode: int
@@ -94,10 +94,20 @@ class Tour(TourBase):
     class Config:
         from_attributes = True
 
-# Statistiques
+# --- Statistiques ---
 class StatistiquesTontine(BaseModel):
     total_cotisations: int
     total_distribue: int
     solde_restant: int
     membres_actifs: int
     tours_realises: int
+
+# --- Authentification ---
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    utilisateur: Utilisateur
+
+class TokenData(BaseModel):
+    telephone: Optional[str] = None
+    role: Optional[str] = None

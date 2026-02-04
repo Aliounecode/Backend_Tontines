@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 import models
@@ -174,3 +175,11 @@ def get_statistiques_tontine(db: Session, tontine_id: int):
         "membres_actifs": membres_actifs,
         "tours_realises": tours_realises
     }
+
+
+# Méthodes supplémentaires
+def get_membres_by_utilisateur(db: Session, utilisateur_id: int):
+    return db.query(models.Membre).filter(models.Membre.id_utilisateur == utilisateur_id).all()
+
+def get_tontines_by_ids(db: Session, tontine_ids: List[int]):
+    return db.query(models.Tontine).filter(models.Tontine.id.in_(tontine_ids)).all()

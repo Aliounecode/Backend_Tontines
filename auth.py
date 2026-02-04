@@ -7,12 +7,20 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 import crud
 import os
+from dotenv import load_dotenv # <--- 1. Import nécessaire
 from database import get_db
 
-# Configuration
-SECRET_KEY = "f42f7472179f9cf153de66fcfa95d836f7f1e3b60fd14fd18badb6bc2b2048c0"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+# <--- 2. Chargement du fichier .env
+load_dotenv()
+
+# <--- 3. Récupération des variables sécurisées
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM", "HS256") # Valeur par défaut "HS256" si non trouvé
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)) # Conversion en int() obligatoire !
+
+# Sécurité : On vérifie que la clé secrète existe bien
+if not SECRET_KEY:
+    raise ValueError("❌ Erreur critique : La variable SECRET_KEY est absente du fichier .env")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
@@ -37,7 +45,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES) # Utilise la variable convertie
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
